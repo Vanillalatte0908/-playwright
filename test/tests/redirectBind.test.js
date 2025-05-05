@@ -9,7 +9,7 @@ function generateUUID() {
   return Math.floor(Math.random() * (100000000 - 1000000) + 1000000) * 123456789;
 }
 
-test('should retrieve access token and call account binding API', async ({ request }) => {
+test('should retrieve access token and call account binding API', async ({ request, page }) => {
   const secretKey = 'mypertamina';
   const encodingSignType = 'default';
   const clientKey = '01HXRAYA91HTCB0FSJJPZRWJ2T';
@@ -93,13 +93,23 @@ expect(accessToken).toBeTruthy();
   const bindResult = await bindResponse.json();
   console.log('Bind Response:', JSON.stringify(bindResult, null, 2));
   expect(bindResponse.ok()).toBeTruthy();
+  const redirectUrl = bindResult.redirectUrl;
+  console.log('Redirect URL:', redirectUrl);
 
-     // Extract and open the redirect URL
-     const redirectUrl = bindResult.redirectUrl;
-     console.log('Redirect URL:', redirectUrl);
-   
-     // Open in default browser (adjust depending on OS)
-     exec(`open "${redirectUrl}"`); // macOS
-     // exec(`start "${redirectUrl}"`); // Windows
-     // exec(`xdg-open "${redirectUrl}"`); // Linux
+  // 4. Visit redirect URL and simulate flow
+  await page.goto(redirectUrl, { waitUntil: 'networkidle' });
+
+  try {
+    await page.getByRole('switch', { timeout: 10000 }).check();
+  } catch {
+    console.warn('Fallback: Could not find switch by role, trying checkbox selector...');
+    await page.locator('input[type="checkbox"]').check();
+  }
+
+  await page.getByRole('button', { name: 'Masuk' }).click();
+  await page.getByRole('button', { name: 'Hubungkan Akun' }).click();
+  await page.getByRole('button', { name: 'SMS' }).click();
+  await page.getByRole('textbox').fill('123456'); // Simulate OTP input
+
+  console.log('✅ Finished redirect binding flow');
 });
