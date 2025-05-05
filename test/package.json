@@ -1,0 +1,38 @@
+{
+  "name": "@playwright/test",
+  "version": "1.52.0",
+  "description": "A high-level API to automate web browsers",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/microsoft/playwright.git"
+  },
+  "homepage": "https://playwright.dev",
+  "engines": {
+    "node": ">=18"
+  },
+  "author": {
+    "name": "Microsoft Corporation"
+  },
+  "license": "Apache-2.0",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "import": "./index.mjs",
+      "require": "./index.js",
+      "default": "./index.js"
+    },
+    "./cli": "./cli.js",
+    "./package.json": "./package.json",
+    "./reporter": "./reporter.js"
+  },
+  "bin": {
+    "playwright": "cli.js"
+  },
+  "scripts": {},
+  "dependencies": {
+    "crypto-js": "^4.2.0",
+    "jsrsasign": "^11.1.0",
+    "moment": "^2.30.1",
+    "playwright": "1.52.0"
+  }
+}
