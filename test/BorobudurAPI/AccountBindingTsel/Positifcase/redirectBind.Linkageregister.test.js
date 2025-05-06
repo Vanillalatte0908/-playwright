@@ -4,23 +4,23 @@ const moment = require('moment');
 const CryptoJS = require('crypto-js');
 const { v4: uuidv4 } = require('uuid');
 const { exec } = require('child_process'); 
-const { generateSignature } = require('../generateSignature');
+const { generateSignature } = require('../../generateSignature');
 function generateUUID() {
   return Math.floor(Math.random() * (100000000 - 1000000) + 1000000) * 123456789;
 }
 
 test('should retrieve access token and call account binding API', async ({ request, page }) => {
-  const secretKey = 'mypertamina';
+  const secretKey = 'fc1817afe3145b5045b74fec75ca5ea6';
   const encodingSignType = 'default';
-  const clientKey = '01HXRAYA91HTCB0FSJJPZRWJ2T';
-  const privateKeyPath = './private_key.pem'; // <== Make sure this file exists in your project
+  const clientKey = '01FSPERZ2G7MS4QYM5JSKZDTD8';
+  const privateKeyPath = './private_key_linkage.pem'; // <== Make sure this file exists in your project
   const { signature, timestamp } = generateSignature(clientKey, privateKeyPath);
   const xtimestamp = moment().format('YYYY-MM-DDTHH:mm:ssZ');
 
   // Get access token
   const authResponse = await request.post('http://borobudur-svc.linkaja.dev:8000/bi/v1.0/access-token/b2b', {
     headers: {
-      'X-CLIENT-KEY': '01HXRAYA91HTCB0FSJJPZRWJ2T',
+      'X-CLIENT-KEY': '01FSPERZ2G7MS4QYM5JSKZDTD8',
       'X-TIMESTAMP': xtimestamp, // Add this
       'X-SIGNATURE': signature
     },
@@ -52,16 +52,13 @@ expect(accessToken).toBeTruthy();
   console.log('Access Token:', authToken); // Log for debugging
 
   const body = {
-    merchantId: 'ss_pertamina',
-    msisdn: '087892111234',
-    additionalInfo: {
-      partnerRedirectUrl: 'https://bankmandiri.co.id',
-      state: uniqueState,
-      scope: 'PAYMENT_GATEWAY',
-      userId: '0000000011',
-      name: 'refqiMM932',
-      payMethod: 'direct_astrapay'
-    }
+      merchantId: '506300908492350',
+      msisdn: '6281113019700',
+      additionalInfo: {
+          partnerRedirectUrl: 'https://google.com',
+          state: 'MM1538archive000100129516',
+          scope:'DIRECT_DEBIT_TRANSACTION'
+      }
   };
 
   const rawBody = JSON.stringify(body);
@@ -82,7 +79,7 @@ expect(accessToken).toBeTruthy();
       'Content-Type': 'application/json',
       'X-TIMESTAMP': xxtimestamp,
       'X-SIGNATURE': xxsignature,
-      'X-PARTNER-ID': '01HXRAYA91HTCB0FSJJPZRWJ2T',
+      'X-PARTNER-ID': '01FSPERZ2G7MS4QYM5JSKZDTD8',
       'X-EXTERNAL-ID': externalId,
       'CHANNEL-ID': '95221',
       'Authorization': `Bearer ${authToken}`
@@ -93,23 +90,53 @@ expect(accessToken).toBeTruthy();
   const bindResult = await bindResponse.json();
   console.log('Bind Response:', JSON.stringify(bindResult, null, 2));
   expect(bindResponse.ok()).toBeTruthy();
+  
+
+  //redirectURL
   const redirectUrl = bindResult.redirectUrl;
   console.log('Redirect URL:', redirectUrl);
 
   // 4. Visit redirect URL and simulate flow
   await page.goto(redirectUrl, { waitUntil: 'networkidle' });
 
-  try {
-    await page.getByRole('switch', { timeout: 10000 }).check();
-  } catch {
-    console.warn('Fallback: Could not find switch by role, trying checkbox selector...');
-    await page.locator('input[type="checkbox"]').check();
+  //Click WEb
+  await page.locator('#sapper label span').click();
+  await page.getByRole('button', { name: 'Lanjut' }).click();
+  await page.getByRole('textbox', { name: 'Masukkan nama lengkap kamu' }).click();
+  await page.getByRole('textbox', { name: 'Masukkan nama lengkap kamu' }).fill('refqi');
+  await page.getByRole('textbox', { name: 'Masukkan email kamu' }).first().click();
+  await page.getByRole('textbox', { name: 'Masukkan email kamu' }).first().fill('hussein@hussein.com');
+  await page.getByRole('textbox', { name: 'Masukkan email kamu' }).nth(1).fill('hussein@hussein.com');
+  await page.getByRole('button', { name: 'Lanjutkan Proses' }).click(); 
+
+  await page.getByRole('textbox', { name: 'Masukkan 6 digit PIN kamu' }).click();
+  await page.getByRole('textbox', { name: 'Masukkan 6 digit PIN kamu' }).fill('123455');
+  await page.getByRole('textbox', { name: 'Masukkan 6 digit PIN kembali' }).click();
+  await page.getByRole('textbox', { name: 'Masukkan 6 digit PIN kembali' }).fill('123455');
+  await page.getByRole('button', { name: 'Konfirmasi' }).click();
+  await page.goto('https://www.google.com/?authCode=01JTFX021HYNRN9V5N33BZQZG5&responseCode=2001000&responseMessage=Successful&state=MM1538archive000100129516');
+
+//Get B2B2C
+
+  const privateKeyPath1 = './private_key_b2b2c.pem'; // <== Make sure this file exists in your project
+  const { signature1, timestamp1 } = generateSignature(clientKey, privateKeyPath);
+  const xtimestamp1= moment().format('YYYY-MM-DDTHH:mm:ssZ');
+const b2b2c = await request.post('http://partner-dev.linkaja.com/bi/v1.0/access-token/b2b2c', {
+  headers: {
+    'X-CLIENT-KEY': '01FSPERZ2G7MS4QYM5JSKZDTD8',
+    'X-TIMESTAMP': xtimestamp1, // Add this
+    'X-SIGNATURE': signature1
+  },
+  data: {
+    grantType: 'AUTHORIZATION_CODE',
+    authCode: '01JT7FVADNT8B7HE8Z4CQDGAYH'  
   }
 
-  await page.getByRole('button', { name: 'Masuk' }).click();
-  await page.getByRole('button', { name: 'Hubungkan Akun' }).click();
-  await page.getByRole('button', { name: 'SMS' }).click();
-  await page.getByRole('textbox').fill('123456'); // Simulate OTP input
+  
+});
+const authJson1 = await authResponse.json();
+console.log('Auth response:', JSON.stringify(authJson1, null, 2)); // ADD THIS
+const accessTokenCustomer = authJson1.accessTokenCustomer;
+expect(accessTokenCustomer).toBeTruthy();
 
-  console.log('✅ Finished redirect binding flow');
 });

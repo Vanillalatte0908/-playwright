@@ -4,7 +4,7 @@ const moment = require('moment');
 const CryptoJS = require('crypto-js');
 const { v4: uuidv4 } = require('uuid');
 const { exec } = require('child_process'); 
-const { generateSignature } = require('../generateSignature');
+const { generateSignature } = require('../../generateSignature');
 function generateUUID() {
   return Math.floor(Math.random() * (100000000 - 1000000) + 1000000) * 123456789;
 }

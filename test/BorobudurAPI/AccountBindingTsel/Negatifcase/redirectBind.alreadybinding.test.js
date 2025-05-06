@@ -1,26 +1,27 @@
 // tests/Binding.test.js
-const { test, expect, request } = require('@playwright/test');
+
+const { test,test2, expect, request } = require('@playwright/test');
 const moment = require('moment');
 const CryptoJS = require('crypto-js');
 const { v4: uuidv4 } = require('uuid');
 const { exec } = require('child_process'); 
-const { generateSignature } = require('../generateSignature');
+const { generateSignature } = require('../../generateSignature');
 function generateUUID() {
   return Math.floor(Math.random() * (100000000 - 1000000) + 1000000) * 123456789;
 }
 
 test('should retrieve access token and call account binding API', async ({ request, page }) => {
-  const secretKey = 'mypertamina';
+  const secretKey = 'fc1817afe3145b5045b74fec75ca5ea6';
   const encodingSignType = 'default';
-  const clientKey = '01HXRAYA91HTCB0FSJJPZRWJ2T';
-  const privateKeyPath = './private_key.pem'; // <== Make sure this file exists in your project
+  const clientKey = '01FSPERZ2G7MS4QYM5JSKZDTD8';
+  const privateKeyPath = './private_key_linkage.pem'; // <== Make sure this file exists in your project
   const { signature, timestamp } = generateSignature(clientKey, privateKeyPath);
   const xtimestamp = moment().format('YYYY-MM-DDTHH:mm:ssZ');
 
   // Get access token
   const authResponse = await request.post('http://borobudur-svc.linkaja.dev:8000/bi/v1.0/access-token/b2b', {
     headers: {
-      'X-CLIENT-KEY': '01HXRAYA91HTCB0FSJJPZRWJ2T',
+      'X-CLIENT-KEY': '01FSPERZ2G7MS4QYM5JSKZDTD8',
       'X-TIMESTAMP': xtimestamp, // Add this
       'X-SIGNATURE': signature
     },
@@ -52,16 +53,13 @@ expect(accessToken).toBeTruthy();
   console.log('Access Token:', authToken); // Log for debugging
 
   const body = {
-    merchantId: 'ss_pertamina',
-    msisdn: '087892111234',
-    additionalInfo: {
-      partnerRedirectUrl: 'https://bankmandiri.co.id',
-      state: uniqueState,
-      scope: 'PAYMENT_GATEWAY',
-      userId: '0000000011',
-      name: 'refqiMM932',
-      payMethod: 'direct_astrapay'
-    }
+      merchantId: '506300908492350',
+      msisdn: '6281113019756',
+      additionalInfo: {
+          partnerRedirectUrl: 'https://google.com',
+          state: 'MM1538archive000100129516',
+          scope:'DIRECT_DEBIT_TRANSACTION'
+      }
   };
 
   const rawBody = JSON.stringify(body);
@@ -82,7 +80,7 @@ expect(accessToken).toBeTruthy();
       'Content-Type': 'application/json',
       'X-TIMESTAMP': xxtimestamp,
       'X-SIGNATURE': xxsignature,
-      'X-PARTNER-ID': '01HXRAYA91HTCB0FSJJPZRWJ2T',
+      'X-PARTNER-ID': '01FSPERZ2G7MS4QYM5JSKZDTD8',
       'X-EXTERNAL-ID': externalId,
       'CHANNEL-ID': '95221',
       'Authorization': `Bearer ${authToken}`
@@ -91,25 +89,6 @@ expect(accessToken).toBeTruthy();
   });
 
   const bindResult = await bindResponse.json();
-  console.log('Bind Response:', JSON.stringify(bindResult, null, 2));
-  expect(bindResponse.ok()).toBeTruthy();
-  const redirectUrl = bindResult.redirectUrl;
-  console.log('Redirect URL:', redirectUrl);
-
-  // 4. Visit redirect URL and simulate flow
-  await page.goto(redirectUrl, { waitUntil: 'networkidle' });
-
-  try {
-    await page.getByRole('switch', { timeout: 10000 }).check();
-  } catch {
-    console.warn('Fallback: Could not find switch by role, trying checkbox selector...');
-    await page.locator('input[type="checkbox"]').check();
-  }
-
-  await page.getByRole('button', { name: 'Masuk' }).click();
-  await page.getByRole('button', { name: 'Hubungkan Akun' }).click();
-  await page.getByRole('button', { name: 'SMS' }).click();
-  await page.getByRole('textbox').fill('123456'); // Simulate OTP input
-
-  console.log('✅ Finished redirect binding flow');
-});
+  expect(bindResult.responseCode).toBe('4030768');
+  expect(bindResult.responseMessage).toBe('Card / Account Already In Use');
+  });
