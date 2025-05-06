@@ -13,7 +13,7 @@ test('should retrieve access token and call account binding API', async ({ reque
   const secretKey = 'fc1817afe3145b5045b74fec75ca5ea6';
   const encodingSignType = 'default';
   const clientKey = '01FSPERZ2G7MS4QYM5JSKZDTD8';
-  const privateKeyPath = './private_key_linkage.pem'; // <== Make sure this file exists in your project
+  const privateKeyPath = '../private_key_linkage.pem'; // <== Make sure this file exists in your project
   const { signature, timestamp } = generateSignature(clientKey, privateKeyPath);
   const xtimestamp = moment().format('YYYY-MM-DDTHH:mm:ssZ');
 

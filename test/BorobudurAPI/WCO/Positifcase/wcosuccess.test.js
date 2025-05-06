@@ -127,7 +127,22 @@ expect(accessToken).toBeTruthy();
 
   //Click WEb
   await page.getByRole('textbox', { name: 'Enter 6 digits LinkAja PIN' }).click();
-  await new Promise(resolve => setTimeout(resolve, 3000)); // 3000 ms = 3 seconds
+  await page.getByRole('textbox', { name: 'Enter 6 digits LinkAja PIN' }).click();
+  await page.getByRole('textbox', { name: 'Enter 6 digits LinkAja PIN' }).fill('1');
+  await page.getByRole('textbox', { name: 'Enter 6 digits LinkAja PIN' }).click();
+  await page.getByRole('textbox', { name: 'Enter 6 digits LinkAja PIN' }).fill('12');
+  await page.getByText('LinkAja PIN').click();
+  await page.getByRole('textbox', { name: 'Enter 6 digits LinkAja PIN' }).click();
+  await page.getByRole('textbox', { name: 'Enter 6 digits LinkAja PIN' }).fill('123');
+  await page.getByText('LinkAja PIN').click();
+  await page.getByRole('textbox', { name: 'Enter 6 digits LinkAja PIN' }).click();
+  await page.getByRole('textbox', { name: 'Enter 6 digits LinkAja PIN' }).click();
+  await page.getByRole('textbox', { name: 'Enter 6 digits LinkAja PIN' }).fill('1234');
+  await page.getByText('LinkAja PIN').click();
+  await page.getByRole('textbox', { name: 'Enter 6 digits LinkAja PIN' }).click();
+  await page.getByRole('textbox', { name: 'Enter 6 digits LinkAja PIN' }).fill('12345');
+  await page.getByText('LinkAja PIN').click();
+  await page.getByRole('textbox', { name: 'Enter 6 digits LinkAja PIN' }).click();
   await page.getByRole('textbox', { name: 'Enter 6 digits LinkAja PIN' }).fill('123455');
   await new Promise(resolve => setTimeout(resolve, 3000)); // 3000 ms = 3 seconds
   await page.getByRole('button', { name: 'Continue' }).click();
