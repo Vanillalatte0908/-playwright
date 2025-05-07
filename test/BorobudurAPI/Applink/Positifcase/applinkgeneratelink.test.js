@@ -1,7 +1,7 @@
 // tests/Binding.test.js
 
-import { reportToTestRail } from './testrail-helper';
-const { test,test2, expect, request } = require('@playwright/test');
+const { reportToTestRail } = require('../../../testrail-helper'); // adjust the path as needed
+const { test2,test, expect, request } = require('@playwright/test');
 const moment = require('moment');
 const CryptoJS = require('crypto-js');
 const { v4: uuidv4 } = require('uuid');

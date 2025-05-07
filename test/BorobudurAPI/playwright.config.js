@@ -2,7 +2,7 @@ const { defineConfig } = require('@playwright/test');
 
 module.exports = defineConfig({
         // Specify the path to your custom fixtures.js file
-         testDir: './test/BorobudurAPI', // Directory where your tests are located
+         testDir: './BorobudurAPI', // Directory where your tests are located
         // Optional: Setup for the browser (if needed
         use: {
           headless: false, // 👈 Show the browser
