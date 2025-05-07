@@ -1,6 +1,6 @@
 // tests/Binding.test.js
 
-const { reportToTestRail } = require('../../../testrail-helper'); // adjust the path as needed
+const { reportToTestRail } = require('../../testrail-helper'); // adjust the path as needed
 const { test2,test, expect, request } = require('@playwright/test');
 const moment = require('moment');
 const CryptoJS = require('crypto-js');
