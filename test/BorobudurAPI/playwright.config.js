@@ -7,6 +7,9 @@ module.exports = defineConfig({
         use: {
           headless: false, // 👈 Show the browser
           viewport: { width: 1280, height: 720 },
+          reporter: [['json', { outputFile: 'report.json' }]],
           // slowMo: 500, // Optional: slow down actions to see them clearly
         }
+
+        
       });
