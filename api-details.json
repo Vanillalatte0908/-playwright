@@ -1,59 +1,24 @@
 {
   "request": {
-    "url": "http://borobudur-svc.linkaja.dev:8000/bi/applink/v1.0/debit/refund",
+    "url": "http://borobudur-svc.linkaja.dev:8000/bi/wco/v1.0/debit/cancel",
     "headers": {
       "Content-Type": "application/json",
-      "X-TIMESTAMP": "2025-05-08T16:22:46+07:00",
-      "X-SIGNATURE": "+tfnH3N70imXCP+06OLI6jJou17Hv+4n+f7DpYT10buxF+SFP7G9v1ORAjjAd2QNmiVuGuX0oyna/79itDAh4A==",
+      "X-TIMESTAMP": "2025-05-09T00:18:48+07:00",
+      "X-SIGNATURE": "FkcKKIC/VpsD8i4O9GY9oJB2ZFAR8uMJAxCFrUP/qyCbIjegeGkhDlqz2dAwfTg+wA2vzcV6CvFWFFeRB8VHPg==",
       "X-PARTNER-ID": "01FSPERZ2G7MS4QYM5JSKZDTD8",
-      "X-EXTERNAL-ID": "1259890852732524",
+      "X-EXTERNAL-ID": "5211609829117560",
       "CHANNEL-ID": "95221",
-      "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6OCwiZXhwIjoxNzQ2Njk3MDY2LCJnZW5lcmF0ZVRpbWUiOjE3NDY2OTYxNjYsInVzZXJJZCI6NH0.cM-S0MOz2ATZHdRhOHpDQ61WH2JxAKkLd8HqwWAQvK4"
+      "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6OCwiZXhwIjoxNzQ2NzI1NjI4LCJnZW5lcmF0ZVRpbWUiOjE3NDY3MjQ3MjgsInVzZXJJZCI6NH0.fA6fTOX6qmYLKUzcezrMcY4jIlTjIZ9qAVjRq662vG4"
     },
     "body": {
-      "originalPartnerReferenceNo": "1746695985",
-      "partnerRefundNo": "refqirefund0002",
-      "merchantId": "snap_applink",
-      "refundAmount": {
-        "value": "150.00",
-        "currency": "IDR"
-      },
+      "originalPartnerReferenceNo": "WCOV2test1743585935217055171",
       "additionalInfo": {
-        "approvalCode": "E81C776901",
-        "terminalId": "snap_applink",
-        "refundType": 2,
-        "items": [
-          {
-            "id": "01",
-            "name": "Item 1",
-            "unitPrice": "150.00",
-            "qty": "1"
-          }
-        ]
+        "refNum": "WCOV2test1743585935217055171"
       }
     }
   },
   "response": {
-    "additionalInfo": {
-      "approvalCode": "E81C776901",
-      "items": [
-        {
-          "id": "01",
-          "qty": "1"
-        }
-      ],
-      "refundType": 2
-    },
-    "originalPartnerReferenceNo": "1746695985",
-    "originalReferenceNo": "p2633642154KvGFdqbeIe",
-    "partnerRefundNo": "refqirefund0002",
-    "refundAmount": {
-      "currency": "IDR",
-      "value": "150"
-    },
-    "refundNo": "E81C77E703",
-    "refundTime": "2025-05-08T16:22:46.852731197+07:00",
-    "responseCode": "2005800",
-    "responseMessage": "Successful"
+    "responseCode": "4055701",
+    "responseMessage": "Requested Operation Is Not Allowed"
   }
 }

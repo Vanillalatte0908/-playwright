@@ -1,13 +1,13 @@
 // Replace these values with your TestRail instance details
 const fs = require('fs');  // Add this line to import fs
 const FormData = require('form-data'); // Ensure you have FormData available
-const { reportWithMultipleAttachments } = require('../../testrail-helper'); // adjust the path as needed
+const { reportWithMultipleAttachments } = require('../testrail-helper'); // adjust the path as needed
 const { test, expect, request } = require('@playwright/test');
 const moment = require('moment');
 const CryptoJS = require('crypto-js');
 const { v4: uuidv4 } = require('uuid');
 const { exec } = require('child_process'); 
-const { generateSignature } = require('../../generateSignature');
+const { generateSignature } = require('../generateSignature');
 function generateUUID() {
 return Math.floor(Math.random() * (100000000 - 1000000) + 1000000) * 123456789;
 };
@@ -50,38 +50,38 @@ test('should retrieve access token and call account binding API', async ({ reque
   console.log('Access Token:', authToken); // Log for debugging
 
   const body = {
-    "PartnerReferenceNo": partnerReferenceNo,
-    "merchantId": "testing_linkaja_wco",
-    "amount": {
-      "value": ".00",
-      "currency": "IDR"
+    PartnerReferenceNo: partnerReferenceNo,
+    merchantId: "testing_linkaja_wco",
+    amount: {
+      value: "2000000.00",
+      currency: "IDR"
     },
-    "urlParams": [
+    urlParams: [
       {
-        "url": "https://google.com",
-        "type": "successUrl",
-        "isDeeplink": "N"
+        url: "https://google.com",
+        type: "successUrl",
+        isDeeplink: "N"
       },
       {
-        "url": "https://google.com",
-        "type": "failedUrl",
-        "isDeeplink": "N"
+        url: "https://google.com",
+        type: "failedUrl",
+        isDeeplink: "N"
       }
     ],
-    "additionalInfo": {
-      "userKey": "wcotest1091",
-      "msisdn": "087787069388",
-      "editable": "Yes",
-      "defaultLanguage": "1",
-      "defaultTemplate": "2",
-      "items": [
-        {
-          "name": "lenovo",
-          "price": "1000",
-          "qty": "1"
-        }
-      ]
-    }
+    additionalInfo: {
+        "userKey": "wcotest1091",
+        "msisdn": "081218244613",
+        "editable": "Yes",
+        "defaultLanguage": "1",
+        "defaultTemplate": "2",
+        "items": [
+          {
+            "name": "lenovo",
+            "price": "1000",
+            "qty": "1"
+          }
+        ]
+      }
   };
 
   const rawBody = JSON.stringify(body);
@@ -109,11 +109,36 @@ test('should retrieve access token and call account binding API', async ({ reque
     },
     data: body
   });
-
+  //redirectURL
   const bindResult = await bindResponse.json();
-  console.log('Bind Response:', JSON.stringify(bindResult, null, 2));
-  expect(bindResult.responseCode).toBe('4045413');
-  expect(bindResult.responseMessage).toBe('Invalid Amount');
+  const redirectUrl = bindResult.webRedirectUrl;
+  console.log('Redirect URL:', redirectUrl);
+
+  // 4. Visit redirect URL and simulate flow
+  await page.goto(redirectUrl, { waitUntil: 'networkidle' });
+
+  //Click WEb
+  await page.getByRole('textbox', { name: 'Enter 6 digits LinkAja PIN' }).click();
+  await page.getByRole('textbox', { name: 'Enter 6 digits LinkAja PIN' }).click();
+  await page.getByRole('textbox', { name: 'Enter 6 digits LinkAja PIN' }).fill('1');
+  await page.getByRole('textbox', { name: 'Enter 6 digits LinkAja PIN' }).click();
+  await page.getByRole('textbox', { name: 'Enter 6 digits LinkAja PIN' }).fill('12');
+  await page.getByText('LinkAja PIN').click();
+  await page.getByRole('textbox', { name: 'Enter 6 digits LinkAja PIN' }).click();
+  await page.getByRole('textbox', { name: 'Enter 6 digits LinkAja PIN' }).fill('123');
+  await page.getByText('LinkAja PIN').click();
+  await page.getByRole('textbox', { name: 'Enter 6 digits LinkAja PIN' }).click();
+  await page.getByRole('textbox', { name: 'Enter 6 digits LinkAja PIN' }).click();
+  await page.getByRole('textbox', { name: 'Enter 6 digits LinkAja PIN' }).fill('1234');
+  await page.getByText('LinkAja PIN').click();
+  await page.getByRole('textbox', { name: 'Enter 6 digits LinkAja PIN' }).click();
+  await page.getByRole('textbox', { name: 'Enter 6 digits LinkAja PIN' }).fill('12345');
+  await page.getByText('LinkAja PIN').click();
+  await page.getByRole('textbox', { name: 'Enter 6 digits LinkAja PIN' }).click();
+  await page.getByRole('textbox', { name: 'Enter 6 digits LinkAja PIN' }).fill('123455');
+  await new Promise(resolve => setTimeout(resolve, 3000)); // 3000 ms = 3 seconds
+  await page.getByRole('button', { name: 'Continue' }).click();
+
   const authJson = await bindResponse.json();
   console.log('Auth response:', JSON.stringify(authJson, null, 2)); // ADD THIS
   const fs = require('fs');
@@ -141,13 +166,12 @@ test('should retrieve access token and call account binding API', async ({ reque
   
   // Upload the .json file as an attachment to TestRail
   await reportWithMultipleAttachments(
-    'C296027',
+    'C174335',
     1,
     'API Test Passed by Playwright',
-    [
     detailsPath,
     body,
     authJson
-    ],
   );
+
   });

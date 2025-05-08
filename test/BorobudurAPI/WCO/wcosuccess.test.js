@@ -1,13 +1,13 @@
 // Replace these values with your TestRail instance details
 const fs = require('fs');  // Add this line to import fs
 const FormData = require('form-data'); // Ensure you have FormData available
-const { reportWithMultipleAttachments } = require('../../testrail-helper'); // adjust the path as needed
+const { reportWithMultipleAttachments } = require('../testrail-helper'); // adjust the path as needed
 const { test, expect, request } = require('@playwright/test');
 const moment = require('moment');
 const CryptoJS = require('crypto-js');
 const { v4: uuidv4 } = require('uuid');
 const { exec } = require('child_process'); 
-const { generateSignature } = require('../../generateSignature');
+const { generateSignature } = require('../generateSignature');
 function generateUUID() {
 return Math.floor(Math.random() * (100000000 - 1000000) + 1000000) * 123456789;
 };
@@ -53,7 +53,7 @@ test('should retrieve access token and call account binding API', async ({ reque
     PartnerReferenceNo: partnerReferenceNo,
     merchantId: "testing_linkaja_wco",
     amount: {
-      value: "1004.00",
+      value: "1008.00",
       currency: "IDR"
     },
     urlParams: [
@@ -69,19 +69,19 @@ test('should retrieve access token and call account binding API', async ({ reque
       }
     ],
     additionalInfo: {
-      userKey : "wcotest1091",
-      msisdn: '087787069388',
-      editable: "Yes",
-      defaultLanguage: "1",
-      defaultTemplate: "2",
-      items: [
-        {
-          name: "lenovo",
-          price: "1004",
-          qty: "1"
-        }
-      ]
-    }
+"userKey": "wcotest1091",
+    "msisdn": "081218244613",
+    "editable": "Yes",
+    "defaultLanguage": "1",
+    "defaultTemplate": "2",
+    "items": [
+      {
+        "name": "lenovo",
+        "price": "1008",
+        "qty": "1"
+      }
+    ]
+  }
   };
 
   const rawBody = JSON.stringify(body);
@@ -109,29 +109,61 @@ test('should retrieve access token and call account binding API', async ({ reque
     },
     data: body
   });
-
   //redirectURL
-   //redirectURL
-   const bindResult = await bindResponse.json();
-   console.log('bindResult:', JSON.stringify(bindResult, null, 2));
-   const redirectUrl = bindResult.webRedirectUrl;
+  const bindResult = await bindResponse.json();
+  console.log('bindResult:', JSON.stringify(bindResult, null, 2));
+  const redirectUrl = bindResult.webRedirectUrl;
 
-  // 4. Visit redirect URL and simulate flow
+if (!redirectUrl) {
+  throw new Error('Redirect URL is undefined. Check API response or flow.');
+}
+  const fs = require('fs');
   await page.goto(redirectUrl, { waitUntil: 'networkidle' });
-
+  // 4. Visit redirect URL and simulate flow
+  const path6 = require('path');
+  const screenshotPath = path6.resolve(`screenshots/example6-${Date.now()}.png`);
+  fs.mkdirSync('screenshots', { recursive: true });
+  await page.screenshot({ path: screenshotPath, fullPage: true });
   //Click WEb
-  await page.getByRole('link', { name: 'Terms & Conditions' }).click();
-  const path8 = require('path');
-  const screenshotPath8 = path8.resolve(`screenshots/example8-${Date.now()}.png`);
+  await page.getByRole('textbox', { name: 'Enter 6 digits LinkAja PIN' }).click();
+  await page.getByRole('textbox', { name: 'Enter 6 digits LinkAja PIN' }).click();
+  await page.getByRole('textbox', { name: 'Enter 6 digits LinkAja PIN' }).fill('1');
+  const path3 = require('path');
+  const screenshotPath3 = path3.resolve(`screenshots/example4-${Date.now()}.png`);
   fs.mkdirSync('screenshots', { recursive: true });
-  await page.screenshot({ path: screenshotPath8, fullPage: true });
+  await page.screenshot({ path: screenshotPath3, fullPage: true });
+  await page.getByRole('textbox', { name: 'Enter 6 digits LinkAja PIN' }).click();
   await new Promise(resolve => setTimeout(resolve, 3000)); // 3000 ms = 3 seconds
-  await page.locator('#modal-snk span').first().click();
-  const path9 = require('path');
-  const screenshotPath9 = path9.resolve(`screenshots/example8-${Date.now()}.png`);
+  await page.getByRole('textbox', { name: 'Enter 6 digits LinkAja PIN' }).fill('12');
+  await page.getByText('LinkAja PIN').click();
+  await page.getByRole('textbox', { name: 'Enter 6 digits LinkAja PIN' }).click();
+  await page.getByRole('textbox', { name: 'Enter 6 digits LinkAja PIN' }).fill('123');
+  await page.getByText('LinkAja PIN').click();
+  await page.getByRole('textbox', { name: 'Enter 6 digits LinkAja PIN' }).click();
+  await page.getByRole('textbox', { name: 'Enter 6 digits LinkAja PIN' }).click();
+  await page.getByRole('textbox', { name: 'Enter 6 digits LinkAja PIN' }).fill('1234');
+  await page.getByText('LinkAja PIN').click();
+  await page.getByRole('textbox', { name: 'Enter 6 digits LinkAja PIN' }).click();
+  await page.getByRole('textbox', { name: 'Enter 6 digits LinkAja PIN' }).fill('12345');
+  await page.getByText('LinkAja PIN').click();
+  await page.getByRole('textbox', { name: 'Enter 6 digits LinkAja PIN' }).click();
+  await page.getByRole('textbox', { name: 'Enter 6 digits LinkAja PIN' }).fill('123455');
+  await new Promise(resolve => setTimeout(resolve, 3000)); // 3000 ms = 3 seconds
+  const path4 = require('path');
+  const screenshotPath4 = path4.resolve(`screenshots/example3-${Date.now()}.png`);
   fs.mkdirSync('screenshots', { recursive: true });
-  await page.screenshot({ path: screenshotPath9, fullPage: true });
+  await page.screenshot({ path: screenshotPath4, fullPage: true });
+  await page.getByRole('button', { name: 'Continue' }).click();
+  await page.getByRole('textbox', { name: 'Enter 6 digits verification' }).click();
+  await page.getByRole('textbox', { name: 'Enter 6 digits verification' }).fill('409919');
   await new Promise(resolve => setTimeout(resolve, 3000)); // 3000 ms = 3 seconds
+  await page.getByRole('button', { name: 'Pay' }).click();
+  const path7 = require('path');
+  const screenshotPath6 = path7.resolve(`screenshots/example1-${Date.now()}.png`);
+  fs.mkdirSync('screenshots', { recursive: true });
+  await page.screenshot({ path: screenshotPath6, fullPage: true });
+  await new Promise(resolve => setTimeout(resolve, 3000)); // 3000 ms = 3 seconds
+ 
  
   const authJson = await bindResponse.json();
   console.log('Auth response:', JSON.stringify(authJson, null, 2)); // ADD THIS
@@ -159,15 +191,17 @@ test('should retrieve access token and call account binding API', async ({ reque
   
   // Upload the .json file as an attachment to TestRail
   await reportWithMultipleAttachments(
-    'C296025',
+    'C174334',
     1,
     'API Test Passed by Playwright',
     [
     detailsPath,// your .json file
     body,
     authJson,
-      screenshotPath8,
-      screenshotPath9
+      screenshotPath,
+      screenshotPath3,
+      screenshotPath4,
+      screenshotPath6
     ],
   );
   
