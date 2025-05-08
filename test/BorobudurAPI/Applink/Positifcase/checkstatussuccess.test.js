@@ -1,14 +1,14 @@
 // tests/Binding.test.js
-
-const { test,test2, expect, request } = require('@playwright/test');
+const { reportToTestRail } = require('../../testrail-helper'); // adjust the path as needed
+const { test, expect, request } = require('@playwright/test');
 const moment = require('moment');
 const CryptoJS = require('crypto-js');
 const { v4: uuidv4 } = require('uuid');
 const { exec } = require('child_process'); 
 const { generateSignature } = require('../../generateSignature');
 function generateUUID() {
-  return Math.floor(Math.random() * (100000000 - 1000000) + 1000000) * 123456789;
-}
+return Math.floor(Math.random() * (100000000 - 1000000) + 1000000) * 123456789;
+};
 
 test('should retrieve access token and call account binding API', async ({ request, page }) => {
   const secretKey = 'fc1817afe3145b5045b74fec75ca5ea6';
@@ -89,4 +89,17 @@ expect(accessToken).toBeTruthy();
 
   const bindResult = await bindResponse.json();
   console.log('Bind Response:', JSON.stringify(bindResult, null, 2));
+  await page.screenshot({ path: 'screenshot-api-test.png' });
+  // Upload screenshot to TestRail
+  const screenshot = fs.readFileSync(screenshotPath);
+  const form = new FormData();
+  form.append('attachment', screenshot, {
+    filename: 'screenshot.png',
+    contentType: 'image/png',
   });
+  const screenshotPath = 'screenshot-api-test.png';
+  await page.screenshot({ path: screenshotPath });
+  // Report to TestRail with screenshot
+  await reportToTestRailWithScreenshot('C193242', 1, 'API Test Passed by playwright', screenshotPath);
+  await browser.close();
+});

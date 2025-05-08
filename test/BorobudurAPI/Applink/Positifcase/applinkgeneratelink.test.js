@@ -1,7 +1,6 @@
-// tests/Binding.test.js
-const axios = require('axios');
-
 // Replace these values with your TestRail instance details
+const fs = require('fs');  // Add this line to import fs
+const FormData = require('form-data'); // Ensure you have FormData available
 const { reportToTestRail } = require('../../testrail-helper'); // adjust the path as needed
 const { test, expect, request } = require('@playwright/test');
 const moment = require('moment');
@@ -51,7 +50,6 @@ expect(accessToken).toBeTruthy();
   const baseUrl = 'http://borobudur-svc.linkaja.dev:8000';
   const xxtimestamp = moment().format('YYYY-MM-DDTHH:mm:ssZ');
   const partnerReferenceNo = `TRX${moment().unix()}`;
-  const uniqueState = `LinkajaAutomate${Number()}`;  // Use uuidv4() for unique state
 
 
   console.log('Access Token:', authToken); // Log for debugging
@@ -103,7 +101,6 @@ expect(accessToken).toBeTruthy();
   }
   console.log('Signing String:', signingString);
   console.log('Signature:', xxsignature);
-
   const bindResponse = await request.post(`${baseUrl}${path}`, {
     headers: {
       'Content-Type': 'application/json',
@@ -116,10 +113,13 @@ expect(accessToken).toBeTruthy();
     },
     data: body
   });
-
-  const bindResult = await bindResponse.json();
-  console.log('Bind Response:', JSON.stringify(bindResult, null, 2));
-  await reportToTestRail(13056, 1, 'User details API passed.'); // Replace 12345 with actual TestRail case ID
-
-
+  const json = await bindResponse.json();
+  console.log('Access Token Response:', JSON.stringify(json, null, 2));
+  expect(json.accessToken).toBeTruthy();
+  expect(token).toBeTruthy();
+  const path1 = require('path');
+  const screenshotPath = path1.resolve('screenshot-api-test.png');
+  // Workaround: we use page just to take a screenshot; or if not using a page, mock it manually.
+  await page.screenshot({ path: screenshotPath });
+  await reportToTestRail('C192443', 1, 'API Test Passed by Playwright', screenshotPath);
   });
