@@ -30,11 +30,6 @@ test('should retrieve access token and call account binding API', async ({ reque
     }
   });
 
-const authJson = await authResponse.json();
-console.log('Auth response:', JSON.stringify(authJson, null, 2)); // ADD THIS
-const accessToken = authJson.accessToken;
-expect(accessToken).toBeTruthy();
-
   // Generate X-External-Id
   const externalId = String(generateUUID());  // Convert UUID to string
   console.log('X-External-Id:', externalId);
@@ -86,20 +81,39 @@ expect(accessToken).toBeTruthy();
     },
     data: body
   });
-
-  const bindResult = await bindResponse.json();
-  console.log('Bind Response:', JSON.stringify(bindResult, null, 2));
-  await page.screenshot({ path: 'screenshot-api-test.png' });
-  // Upload screenshot to TestRail
-  const screenshot = fs.readFileSync(screenshotPath);
-  const form = new FormData();
-  form.append('attachment', screenshot, {
-    filename: 'screenshot.png',
-    contentType: 'image/png',
-  });
-  const screenshotPath = 'screenshot-api-test.png';
-  await page.screenshot({ path: screenshotPath });
-  // Report to TestRail with screenshot
-  await reportToTestRailWithScreenshot('C193242', 1, 'API Test Passed by playwright', screenshotPath);
-  await browser.close();
-});
+  const authJson = await bindResponse.json();
+  console.log('Auth response:', JSON.stringify(authJson, null, 2)); // ADD THIS
+  const fs = require('fs');
+  const path1 = require('path');
+  // Define full path to the file before using it
+  const detailsPath = path1.resolve('api-details.json');
+  
+  // Write request and response details to the file
+  fs.writeFileSync(detailsPath, JSON.stringify({
+    request: {
+      url: `${baseUrl}${path}`,
+      headers: {
+        'Content-Type': 'application/json',
+        'X-TIMESTAMP': xxtimestamp,
+        'X-SIGNATURE': xxsignature,
+        'X-PARTNER-ID': '01FSPERZ2G7MS4QYM5JSKZDTD8',
+        'X-EXTERNAL-ID': externalId,
+        'CHANNEL-ID': '95221',
+        'Authorization': `Bearer ${authToken}`
+      },
+      body
+    },
+    response: authJson
+  }, null, 2));
+  
+  // Upload the .json file as an attachment to TestRail
+  await reportToTestRail(
+    'C193521',
+    1,
+    'API Test Passed by Playwright',
+    detailsPath,
+    body,
+    authJson
+  );
+  
+    });

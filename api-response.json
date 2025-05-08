@@ -1,0 +1,23 @@
+{
+  "id": 281633,
+  "test_id": 329146,
+  "status_id": 1,
+  "created_on": 1746690853,
+  "assignedto_id": null,
+  "comment": "API Test Passed by Playwright",
+  "version": null,
+  "elapsed": null,
+  "defects": null,
+  "created_by": 7,
+  "custom_step_results": null,
+  "custom_testrail_bdd_scenario_results": null,
+  "custom_environment": 2,
+  "custom_journey_submodule": null,
+  "custom_severity_level": null,
+  "custom_account_type": null,
+  "custom_device_name": null,
+  "custom_os_version": null,
+  "custom_msisdn": null,
+  "custom_app_name": null,
+  "attachment_ids": []
+}

@@ -1,3 +1,5 @@
+// tests/Binding.test.js
+
 // Replace these values with your TestRail instance details
 const fs = require('fs');  // Add this line to import fs
 const FormData = require('form-data'); // Ensure you have FormData available
@@ -13,7 +15,6 @@ return Math.floor(Math.random() * (100000000 - 1000000) + 1000000) * 123456789;
 };
 
 test('should retrieve access token and call account binding API', async ({ request, page }) => {
-
   const secretKey = 'fc1817afe3145b5045b74fec75ca5ea6';
   const encodingSignType = 'default';
   const clientKey = '01FSPERZ2G7MS4QYM5JSKZDTD8';
@@ -33,8 +34,6 @@ test('should retrieve access token and call account binding API', async ({ reque
     }
   });
 
-
-
   // Generate X-External-Id
   const externalId = String(generateUUID());  // Convert UUID to string
   console.log('X-External-Id:', externalId);
@@ -47,13 +46,17 @@ test('should retrieve access token and call account binding API', async ({ reque
   const baseUrl = 'http://borobudur-svc.linkaja.dev:8000';
   const xxtimestamp = moment().format('YYYY-MM-DDTHH:mm:ssZ');
   const partnerReferenceNo = `TRX${moment().unix()}`;
+  const uniqueState = `LinkajaAutomate${Number()}`;  // Use uuidv4() for unique state
+
+
+  console.log('Access Token:', authToken); // Log for debugging
 
   const body = {
     "partnerReferenceNo": partnerReferenceNo,
     "merchantId": "snap_applink",
     "terminalId": "snap_applink",
     "amount": {
-      "value": "300.00",
+      "value": "301.00",
       "currency": "IDR"
     },
     "urlParams": [
@@ -95,6 +98,7 @@ test('should retrieve access token and call account binding API', async ({ reque
   }
   console.log('Signing String:', signingString);
   console.log('Signature:', xxsignature);
+
   const bindResponse = await request.post(`${baseUrl}${path}`, {
     headers: {
       'Content-Type': 'application/json',
@@ -107,6 +111,7 @@ test('should retrieve access token and call account binding API', async ({ reque
     },
     data: body
   });
+
   const authJson = await bindResponse.json();
   console.log('Auth response:', JSON.stringify(authJson, null, 2)); // ADD THIS
   const fs = require('fs');
@@ -134,7 +139,7 @@ test('should retrieve access token and call account binding API', async ({ reque
   
   // Upload the .json file as an attachment to TestRail
   await reportToTestRail(
-    'C193519',
+    'C193246',
     1,
     'API Test Passed by Playwright',
     detailsPath,

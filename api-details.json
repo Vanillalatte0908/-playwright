@@ -1,0 +1,52 @@
+{
+  "request": {
+    "url": "http://borobudur-svc.linkaja.dev:8000/bi/applink/v1.0/debit/payment-host-to-host",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-TIMESTAMP": "2025-05-08T15:58:06+07:00",
+      "X-SIGNATURE": "jHAQCY7aClarjwM71/XK60b6WEP/wHPntVhfwrkiQwxcFd4iIHQVUd+hM1YaC2cGrP5p2049DNENocsfw2szlw==",
+      "X-PARTNER-ID": "01FSPERZ2G7MS4QYM5JSKZDTD8",
+      "X-EXTERNAL-ID": "5475945135354084",
+      "CHANNEL-ID": "95221",
+      "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6OCwiZXhwIjoxNzQ2Njk1NTg2LCJnZW5lcmF0ZVRpbWUiOjE3NDY2OTQ2ODYsInVzZXJJZCI6NH0.LcldqGFPjNS23tCQKdR8KdnYvMlVN4YPos40wMSsZa4"
+    },
+    "body": {
+      "partnerReferenceNo": "TRX1746694686",
+      "merchantId": "snap_applink",
+      "terminalId": "snap_applink",
+      "amount": {
+        "value": "301.00",
+        "currency": "IDR"
+      },
+      "urlParams": [
+        {
+          "url": "https://www.tokopedia.com",
+          "type": "partnerApplink",
+          "isDeeplink": "N"
+        }
+      ],
+      "additionalInfo": {
+        "trxDate": "{{applinkTrxDate}}",
+        "terminalName": "Tsel WebComm",
+        "items": [
+          {
+            "id": "01",
+            "name": "Item 1",
+            "unitPrice": "150.00",
+            "qty": "1"
+          },
+          {
+            "id": "02",
+            "name": "Item 2",
+            "unitPrice": "150.00",
+            "qty": "1"
+          }
+        ]
+      }
+    }
+  },
+  "response": {
+    "responseCode": "4045413",
+    "responseMessage": "Invalid Amount"
+  }
+}

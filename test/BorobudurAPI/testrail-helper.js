@@ -1,53 +1,56 @@
-const TestRail = require('testrail-api');
-const fs = require('fs');  // Add this line to import fs
+const fs = require('fs');  // Import fs module
 const path = require('path');
 const FormData = require('form-data');
-const testrail = new TestRail({
+const fetch = require('node-fetch');  // Ensure fetch is available in Node.js
 
-  host: 'https://testcaselinkaja.testrail.io',
-  user: 'refqi_hussein@linkaja.id',
-  password: 'Awv/atGLoU6SnQxkWRuA-gaPQnVX1.AQMznm8qoyX',
-});
+async function reportToTestRail(caseId, statusId, comment, screenshotPath, requestDetails, responseDetails) {
 
-async function reportToTestRail(caseId, statusId, comment) {
-  const runId = 13056;
-  const numericCaseId = caseId.startsWith('C') ? caseId.slice(1) : caseId;
-  const screenshotPath = path.resolve('screenshot-api-test.png');
+  const runId = 13056;  // Replace with your actual run ID
   const form = new FormData();
-  const path1 = path.resolve('screenshot-api-test.png');
-  const fileStream = fs.createReadStream(path1);  
   form.append('attachment', fs.createReadStream(screenshotPath));
+  
+  // Step 1: Add test result to TestRail
+  const resultRes = await fetch(`https://testcaselinkaja.testrail.io/index.php?/api/v2/add_result_for_case/${runId}/${caseId.replace('C', '')}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: 'Basic ' + Buffer.from('refqi_hussein@linkaja.id:Awv/atGLoU6SnQxkWRuA-gaPQnVX1.AQMznm8qoyX').toString('base64'),
+    },
+    body: JSON.stringify({
+      status_id: statusId,
+      comment,
+      custom_environment: 2,  // Optional custom field, replace as needed
+      custom_request_details: JSON.stringify(requestDetails, null, 2),
+      custom_response_details: JSON.stringify(responseDetails, null, 2),
+    }),
+  });
 
-  try {
-    // First, post the test result
-    const resultResponse = await fetch(`https://testcaselinkaja.testrail.io/index.php?/api/v2/add_result_for_case/${runId}/${numericCaseId}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: 'Basic ' + Buffer.from('refqi_hussein@linkaja.id:Awv/atGLoU6SnQxkWRuA-gaPQnVX1.AQMznm8qoyX').toString('base64')
-      },
-      body: JSON.stringify({
-        status_id: statusId,
-        comment,
-        custom_environment: 2
-      })
-    });
+  const resultJson = await resultRes.json();
+  if (!resultRes.ok || !resultJson.id) {
+    console.error('❌ Failed to create test result:', resultJson);
+    return;
+  }
 
-    const resultData = await resultResponse.json();
+  // Step 2: Upload the screenshot
+  const uploadRes = await fetch(`https://testcaselinkaja.testrail.io/index.php?/api/v2/add_attachment_to_result/${resultJson.id}`, {
+    method: 'POST',
+    headers: {
+      Authorization: 'Basic ' + Buffer.from('refqi_hussein@linkaja.id:Awv/atGLoU6SnQxkWRuA-gaPQnVX1.AQMznm8qoyX').toString('base64'),
+    },
+    body: form,
+  });
 
-    // Then, upload the screenshot as an attachment
-    await fetch(`https://testcaselinkaja.testrail.io/index.php?/api/v2/add_attachment_to_result/${resultData.id}`, {
-      method: 'POST',
-      headers: {
-        Authorization: 'Basic ' + Buffer.from('refqi_hussein@linkaja.id:Awv/atGLoU6SnQxkWRuA-gaPQnVX1.AQMznm8qoyX').toString('base64')
-      },
-      body: form
-    });
-
-    console.log(`✅ Reported to TestRail: case ${caseId}, status ${statusId} with screenshot`);
-  } catch (err) {
-    console.error('❌ Error reporting to TestRail:', err.message || err);
+  const uploadText = await uploadRes.text();
+  if (!uploadRes.ok) {
+    console.error('❌ Upload failed. Status:', uploadRes.status);
+    console.error('❌ Response:', uploadText);
+  } else {
+    try {
+      const uploadResult = JSON.parse(uploadText);
+      console.log('✅ Uploaded attachment response:', uploadResult);
+    } catch (e) {
+      console.error('❌ Could not parse upload response:', uploadText);
+    }
   }
 }
-
 module.exports = { reportToTestRail };
