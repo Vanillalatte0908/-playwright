@@ -1,11 +1,11 @@
 // tests/Binding.test.js
-const { reportToTestRail } = require('../../testrail-helper'); // adjust the path as needed
+const { reportToTestRail } = require('../../helper/testrail-helper'); // adjust the path as needed
 const { test, expect, request } = require('@playwright/test');
 const moment = require('moment');
 const CryptoJS = require('crypto-js');
 const { v4: uuidv4 } = require('uuid');
 const { exec } = require('child_process'); 
-const { generateSignature } = require('../../generateSignature');
+const { generateSignature } = require('../../Signature/generateSignature');
 function generateUUID() {
 return Math.floor(Math.random() * (100000000 - 1000000) + 1000000) * 123456789;
 };

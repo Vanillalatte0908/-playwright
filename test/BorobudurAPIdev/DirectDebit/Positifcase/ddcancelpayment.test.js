@@ -1,18 +1,18 @@
 // Replace these values with your TestRail instance details
 const fs = require('fs');  // Add this line to import fs
 const FormData = require('form-data'); // Ensure you have FormData available
-const { reportWithMultipleAttachments } = require('../../helper/testrail-helper'); // adjust the path as needed
 const { test, expect, request } = require('@playwright/test');
 const moment = require('moment');
 const CryptoJS = require('crypto-js');
 const { v4: uuidv4 } = require('uuid');
 const { exec } = require('child_process'); 
+const { makePayment } = require('../../helper/approval-helper');
 const { generateSignature } = require('../../Signature/generateSignature');
 function generateUUID() {
 return Math.floor(Math.random() * (100000000 - 1000000) + 1000000) * 123456789;
 };
 
-test('should retrieve access token and call account binding API', async ({ request, page }) => {
+test('should retrieve access token and call account binding API', async ({ request }) => {
   const secretKey = 'fc1817afe3145b5045b74fec75ca5ea6';
   const encodingSignType = 'default';
   const clientKey = '01FSPERZ2G7MS4QYM5JSKZDTD8';
@@ -40,7 +40,7 @@ test('should retrieve access token and call account binding API', async ({ reque
   const xauthJson = await authResponse.json();
   const authToken = xauthJson.accessToken;  // Extract the access token
   const method = 'POST';
-  const path = '/bi/wco/v1.0/debit/cancel';
+  const path = '/bi/v1.0/debit/cancel';
   const baseUrl = 'http://borobudur-svc.linkaja.dev:8000';
   const xxtimestamp = moment().format('YYYY-MM-DDTHH:mm:ssZ');
   const partnerReferenceNo = `TRX${moment().unix()}`;
@@ -48,14 +48,29 @@ test('should retrieve access token and call account binding API', async ({ reque
 
 
   console.log('Access Token:', authToken); // Log for debugging
+  const {
+    approvalCode,
+    partnerReferenceNo1
+  } = await makePayment(request, expect);
+
+  expect(approvalCode).toBeTruthy();
+  expect(partnerReferenceNo).toBeTruthy();
 
   const body = {
-    "originalPartnerReferenceNo": "WCOV2test1746724330223120770",
+    "partnerReferenceNo": partnerReferenceNo1,
+    "approvalCode": approvalCode,
+    "merchantId": "506300908492350",
+    "amount": {
+        "value": "1800.00",
+        "currency": "IDR"
+    },
     "additionalInfo": {
-        "refNum": "WCOV2test1746724330223120770"
+        "thirdPartyID": "POS_Broker",
+        "password": "gMMqGGrKxsE=",
+        "identifier": "TestDD",
+        "securityCredential": "gMMqGGrKxsE="
     }
-}
-
+};
   const rawBody = JSON.stringify(body);
   const hashBody = CryptoJS.SHA256(rawBody).toString();
   const signingString = `${method}:${path}:${authToken}:${hashBody}:${timestamp}`;
@@ -68,8 +83,9 @@ test('should retrieve access token and call account binding API', async ({ reque
   }
   console.log('Signing String:', signingString);
   console.log('Signature:', xxsignature);
+ 
 
-  const bindResponse = await request.post(`${baseUrl}${path}`, {
+  const cancelResult = await request.post(`${baseUrl}${path}`, {
     headers: {
       'Content-Type': 'application/json',
       'X-TIMESTAMP': xxtimestamp,
@@ -78,47 +94,50 @@ test('should retrieve access token and call account binding API', async ({ reque
       'X-EXTERNAL-ID': externalId,
       'CHANNEL-ID': '95221',
       'Authorization': `Bearer ${authToken}`
-    },
+        },
     data: body
   });
+  const cancel1 = await cancelResult.json();
+  console.log('payment response:', JSON.stringify(cancel1, null, 2)); 
+  expect(cancel1.responseCode).toBe('2005700');
 
-  const bindResult = await bindResponse.json();
-  console.log('Bind Response:', JSON.stringify(bindResult, null, 2));
-  expect(bindResponse.ok()).toBeTruthy();
-  const authJson = await bindResponse.json();
-  console.log('Auth response:', JSON.stringify(authJson, null, 2)); // ADD THIS
-  const fs = require('fs');
-  const path1 = require('path');
+   // const path1 = require('path');
   // Define full path to the file before using it
-  const detailsPath = path1.resolve('api-details.json');
+  //const detailsPath = path1.resolve('api-details.json');
   
   // Write request and response details to the file
-  fs.writeFileSync(detailsPath, JSON.stringify({
-    request: {
-      url: `${baseUrl}${path}`,
-      headers: {
-        'Content-Type': 'application/json',
-        'X-TIMESTAMP': xxtimestamp,
-        'X-SIGNATURE': xxsignature,
-        'X-PARTNER-ID': '01FSPERZ2G7MS4QYM5JSKZDTD8',
-        'X-EXTERNAL-ID': externalId,
-        'CHANNEL-ID': '95221',
-        'Authorization': `Bearer ${authToken}`
-      },
-      body
-    },
-    response: authJson
-  }, null, 2));
+  //fs.writeFileSync(detailsPath, JSON.stringify({
+    //request: {
+      //url: `${baseUrl}${path}`,
+      //headers: {
+        //'Content-Type': 'application/json',
+        //'X-TIMESTAMP': xxtimestamp,
+        //'X-SIGNATURE': xxsignature,
+        //'X-PARTNER-ID': '01FSPERZ2G7MS4QYM5JSKZDTD8',
+        //'X-EXTERNAL-ID': externalId,
+        //'CHANNEL-ID': '95221',
+        //'Authorization': `Bearer ${authToken}`,
+        //'X-DEVICE-ID': '09864ADCASA'
+//      },
+  //    body
+   // },
+    //response: authJson
+  //}, null, 2));
   
   // Upload the .json file as an attachment to TestRail
-  await reportWithMultipleAttachments(
-    'C296029',
-    1,
-    'API Test Passed by Playwright',
-    [
-    detailsPath,
-    body,
-    authJson
-    ],
-  );
+  //await reportWithMultipleAttachments(
+    //'C174334',
+    //1,
+    //'API Test Passed by Playwright',
+    //[
+    //detailsPath,// your .json file
+    //body,
+    //authJson,
+     // screenshotPath,
+      //screenshotPath3,
+      //screenshotPath4,
+      //screenshotPath6
+    //],
+  //);
+  
   });
